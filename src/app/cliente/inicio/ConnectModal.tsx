@@ -27,6 +27,22 @@ const SPECIALTY_LABEL: Record<string, string> = {
   other:       '🔧 Outro',
 }
 
+const PREFS_PLACEHOLDER: Record<string, string> = {
+  manicure:    'Ex: prefiro esmaltação em gel, tenho unhas quebradiças...',
+  hairdresser: 'Ex: cabelo colorido quimicamente, prefiro corte seco...',
+  massagist:   'Ex: prefiro massagem mais leve, já fiz drenagem por 3 meses...',
+  esthetician: 'Ex: pele sensível, já fiz peeling químico, tenho manchas...',
+  other:       'Ex: preferências ou experiências anteriores relevantes...',
+}
+
+const RESTRICTIONS_EXAMPLE: Record<string, string> = {
+  manicure:    'ex: acetona, gel UV, lixa elétrica',
+  hairdresser: 'ex: amônia, progressiva, coloração permanente',
+  massagist:   'ex: ventosaterapia, pedras quentes',
+  esthetician: 'ex: ácido retinóico, peeling forte, laser',
+  other:       'ex: técnicas ou produtos a evitar',
+}
+
 export default function ConnectModal({ open, onOpenChange, initialCode = '', initialName = '', initialPhone = '', onSuccess }: Props) {
   const [isPending, startTransition] = useTransition()
   const [step, setStep]   = useState<'code' | 'confirm' | 'done'>('code')
@@ -147,33 +163,43 @@ export default function ConnectModal({ open, onOpenChange, initialCode = '', ini
             </div>
 
             <div className="space-y-3">
-              <div className="space-y-1.5">
-                <Label className="text-xs font-medium" style={{ color: 'oklch(0.35 0.012 155)' }}>
-                  Seu nome completo *
-                </Label>
-                <Input
-                  name="name"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Maria Silva"
-                  className="h-10 text-sm"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs font-medium" style={{ color: 'oklch(0.35 0.012 155)' }}>
-                  Telefone com DDD *
-                </Label>
-                <Input
-                  name="phone"
-                  required
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="(11) 99999-0000"
-                  className="h-10 text-sm"
-                />
-              </div>
+              {/* Nome e telefone: ocultos se já vieram do cadastro */}
+              {initialName && initialPhone ? (
+                <>
+                  <input type="hidden" name="name" value={name} />
+                  <input type="hidden" name="phone" value={phone} />
+                </>
+              ) : (
+                <>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium" style={{ color: 'oklch(0.35 0.012 155)' }}>
+                      Seu nome completo *
+                    </Label>
+                    <Input
+                      name="name"
+                      required
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Maria Silva"
+                      className="h-10 text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium" style={{ color: 'oklch(0.35 0.012 155)' }}>
+                      Telefone com DDD *
+                    </Label>
+                    <Input
+                      name="phone"
+                      required
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="(11) 99999-0000"
+                      className="h-10 text-sm"
+                    />
+                  </div>
+                </>
+              )}
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium" style={{ color: 'oklch(0.35 0.012 155)' }}>
                   Preferências ou experiências anteriores
@@ -183,7 +209,7 @@ export default function ConnectModal({ open, onOpenChange, initialCode = '', ini
                   value={prefs}
                   onChange={(e) => setPrefs(e.target.value)}
                   rows={3}
-                  placeholder="Ex: prefiro massagem mais leve, já fiz drenagem por 3 meses..."
+                  placeholder={PREFS_PLACEHOLDER[professional.specialty ?? ''] ?? PREFS_PLACEHOLDER.other}
                   className="resize-none text-sm"
                 />
                 <p className="text-xs" style={{ color: 'oklch(0.65 0.010 155)' }}>
@@ -198,7 +224,7 @@ export default function ConnectModal({ open, onOpenChange, initialCode = '', ini
                 Restrições
               </Label>
               <p className="text-xs" style={{ color: 'oklch(0.65 0.010 155)' }}>
-                Técnicas que devem ser evitadas (ex: ventosaterapia, pedras quentes). Opcional.
+                Técnicas que devem ser evitadas ({RESTRICTIONS_EXAMPLE[professional.specialty ?? ''] ?? RESTRICTIONS_EXAMPLE.other}). Opcional.
               </p>
               {restrictionList.map((r, i) => (
                 <div key={i} className="flex gap-2">
