@@ -18,6 +18,7 @@ export const users = pgTable('users', {
   image:         text('image'),
   role:          text('role', { enum: ['professional', 'patient', 'admin'] }).notNull().default('patient'),
   passwordHash:  text('password_hash'),
+  onboardedAt:   timestamp('onboarded_at', { mode: 'date' }),
 })
 
 export const accounts = pgTable('accounts', {

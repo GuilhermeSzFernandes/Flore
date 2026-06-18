@@ -1,6 +1,6 @@
 import { auth } from '@/auth'
 import { db } from '@/db'
-import { patients, appointments, professionals, sessionNotes } from '@/db/schema'
+import { patients, appointments, professionals, sessionNotes, users } from '@/db/schema'
 import { eq, and, inArray, gte, asc, desc, or } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
 import InicioClient from './InicioClient'
@@ -12,6 +12,13 @@ export default async function ClienteInicioPage({
 }) {
   const session = await auth()
   if (!session?.user?.id) redirect('/login')
+
+  // Garante que o paciente completou o cadastro inicial
+  const dbUser = await db.query.users.findFirst({
+    where: eq(users.id, session.user.id),
+    columns: { onboardedAt: true },
+  })
+  if (!dbUser?.onboardedAt) redirect('/cliente/cadastro')
 
   const { conectar } = await searchParams
 

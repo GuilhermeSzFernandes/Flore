@@ -2,7 +2,7 @@
 
 import { auth } from '@/auth'
 import { db } from '@/db'
-import { appointments, patients, professionals, services } from '@/db/schema'
+import { appointments, patients, professionals, services, users } from '@/db/schema'
 import { eq, and, gte, lt, count, or } from 'drizzle-orm'
 import { startOfMonth, endOfMonth } from 'date-fns'
 import { canCreateAppointment, canAddPatient, type Plan } from '@/lib/plan'
@@ -70,6 +70,14 @@ export async function registerPatient(formData: FormData) {
       email:  session.user.email ?? null,
     })
     .returning({ id: patients.id, name: patients.name, phone: patients.phone })
+
+  // Marca o onboarding como concluído para quem chegou pelo link de agendamento
+  if (session.user.id) {
+    await db
+      .update(users)
+      .set({ onboardedAt: new Date() })
+      .where(eq(users.id, session.user.id))
+  }
 
   return { success: true as const, patient: created }
 }

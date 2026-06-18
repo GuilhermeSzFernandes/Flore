@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { createService, toggleService, ensureConnectCode } from '@/actions/services'
+import { getAppUrl } from '@/lib/app-url'
 import ProfileForm from './ProfileForm'
 
 const planLabels: Record<string, string> = {
@@ -32,7 +33,7 @@ export default async function ConfiguracoesPage() {
     orderBy: (t, { asc }) => [asc(t.name)],
   })
 
-  const appUrl      = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+  const appUrl      = await getAppUrl()
   const connectLink = `${appUrl}/conectar/${professional.connectCode ?? ''}`
 
   return (

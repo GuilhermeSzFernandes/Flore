@@ -167,7 +167,7 @@ export default function PublicBookingForm({
               </p>
             </div>
             <button
-              onClick={() => signIn('google', { callbackUrl: `/agendar/${professional.slug}` })}
+              onClick={() => signIn('google', { callbackUrl: `/cliente/cadastro?next=${encodeURIComponent(`/agendar/${professional.slug}`)}` })}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-white transition-opacity hover:opacity-90"
               style={{ background: 'oklch(0.575 0.115 27)' }}
             >
