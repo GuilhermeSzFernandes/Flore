@@ -4,6 +4,7 @@ import { signOut } from '@/auth'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import Link from 'next/link'
 import { Home, User } from 'lucide-react'
+import FeedbackFAB from '@/components/FeedbackFAB'
 
 const navItems = [
   { href: '/cliente/inicio', label: 'Início',     icon: Home },
@@ -55,6 +56,8 @@ export default async function ClienteLayout({ children }: { children: React.Reac
       <main className="flex-1 overflow-auto">
         {children}
       </main>
+
+      <FeedbackFAB />
 
       {/* Nav mobile bottom */}
       <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-20 flex border-t border-border bg-background">

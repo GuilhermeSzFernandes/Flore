@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { LogOut } from 'lucide-react'
 import { SidebarNav } from './SidebarNav'
+import FeedbackFAB from '@/components/FeedbackFAB'
 
 const planLabels: Record<string, string> = {
   beta:   'Beta',
@@ -99,6 +100,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <main className="flex-1 overflow-auto h-screen">
         {children}
       </main>
+
+      <FeedbackFAB />
     </div>
   )
 }

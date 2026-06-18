@@ -139,6 +139,16 @@ export const blockedTimes = pgTable('blocked_times', {
   createdAt:      timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
 })
 
+export const feedbackReports = pgTable('feedback_reports', {
+  id:          text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId:      text('user_id').references(() => users.id, { onDelete: 'set null' }),
+  userEmail:   text('user_email'),
+  userRole:    text('user_role'),
+  description: text('description').notNull(),
+  url:         text('url'),
+  createdAt:   timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+})
+
 // ── Inferred types ───────────────────────────────────────────────────────────
 
 export type User = typeof users.$inferSelect
@@ -149,3 +159,4 @@ export type Appointment = typeof appointments.$inferSelect
 export type SessionNote = typeof sessionNotes.$inferSelect
 export type Service = typeof services.$inferSelect
 export type BlockedTime = typeof blockedTimes.$inferSelect
+export type FeedbackReport = typeof feedbackReports.$inferSelect
