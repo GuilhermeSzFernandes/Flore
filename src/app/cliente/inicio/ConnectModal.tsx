@@ -14,6 +14,8 @@ interface Props {
   open: boolean
   onOpenChange: (v: boolean) => void
   initialCode?: string
+  initialName?: string
+  initialPhone?: string
   onSuccess: () => void
 }
 
@@ -25,13 +27,13 @@ const SPECIALTY_LABEL: Record<string, string> = {
   other:       '🔧 Outro',
 }
 
-export default function ConnectModal({ open, onOpenChange, initialCode = '', onSuccess }: Props) {
+export default function ConnectModal({ open, onOpenChange, initialCode = '', initialName = '', initialPhone = '', onSuccess }: Props) {
   const [isPending, startTransition] = useTransition()
   const [step, setStep]   = useState<'code' | 'confirm' | 'done'>('code')
   const [code, setCode]   = useState(initialCode.toUpperCase())
   const [professional, setProfessional] = useState<{ id: string; displayName: string; businessName: string | null; specialty: string | null } | null>(null)
-  const [name, setName]   = useState('')
-  const [phone, setPhone] = useState('')
+  const [name, setName]   = useState(initialName)
+  const [phone, setPhone] = useState(initialPhone)
   const [prefs, setPrefs] = useState('')
   const [restrictionList, setRestrictionList] = useState<string[]>([])
 
@@ -70,8 +72,8 @@ export default function ConnectModal({ open, onOpenChange, initialCode = '', onS
     setStep('code')
     setCode('')
     setProfessional(null)
-    setName('')
-    setPhone('')
+    setName(initialName)
+    setPhone(initialPhone)
     setPrefs('')
     setRestrictionList([])
     onOpenChange(false)

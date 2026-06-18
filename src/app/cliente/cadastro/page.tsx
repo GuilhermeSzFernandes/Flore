@@ -15,7 +15,6 @@ export default async function CadastroPage({
   if (session.user.role !== 'patient') redirect('/dashboard')
 
   const { next } = await searchParams
-  // Aceita apenas URLs internas por segurança
   const nextUrl = next && next.startsWith('/') ? next : null
 
   const user = await db.query.users.findFirst({
@@ -23,22 +22,8 @@ export default async function CadastroPage({
     columns: { name: true, image: true, onboardedAt: true },
   })
 
-  // Já passou pelo onboarding → vai para o destino ou início
-  if (user?.onboardedAt) {
-    redirect(nextUrl ?? '/cliente/inicio')
-  }
+  if (user?.onboardedAt) redirect(nextUrl ?? '/cliente/inicio')
 
-  // Vem de um link de agendamento → marca como onboarded automaticamente e
-  // volta para a página do profissional (o "Primeiro acesso" lá coleta nome+telefone)
-  if (nextUrl?.startsWith('/agendar/')) {
-    await db
-      .update(users)
-      .set({ onboardedAt: new Date() })
-      .where(eq(users.id, session.user.id))
-    redirect(nextUrl)
-  }
-
-  // Fluxo normal (login pela home) → exibe tela de boas-vindas
   return (
     <CadastroForm
       name={user?.name ?? session.user.name ?? ''}

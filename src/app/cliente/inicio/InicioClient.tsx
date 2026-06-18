@@ -48,6 +48,8 @@ interface Professional {
 
 interface Props {
   firstName: string
+  userName: string
+  userPhone: string
   upcomingAppointments: Appointment[]
   pastAppointments: PastAppointment[]
   notesByApt: Record<string, SessionNote>
@@ -67,7 +69,7 @@ const PAST_STATUS_CONFIG: Record<string, { label: string; color: string; bg: str
   scheduled: { label: 'Agendado',   color: 'oklch(0.45 0.010 155)', bg: 'oklch(0.45 0.010 155 / 10%)', icon: Calendar },
 }
 
-export default function InicioClient({ firstName, upcomingAppointments, pastAppointments, notesByApt, professionals, initialCode }: Props) {
+export default function InicioClient({ firstName, userName, userPhone, upcomingAppointments, pastAppointments, notesByApt, professionals, initialCode }: Props) {
   const router = useRouter()
   const [connectOpen, setConnectOpen] = useState(!!initialCode)
   const [bookingPro, setBookingPro]   = useState<{ id: string; displayName: string } | null>(null)
@@ -276,6 +278,8 @@ export default function InicioClient({ firstName, upcomingAppointments, pastAppo
         open={connectOpen}
         onOpenChange={setConnectOpen}
         initialCode={initialCode}
+        initialName={userName}
+        initialPhone={userPhone}
         onSuccess={handleConnectSuccess}
       />
       <BookingModal
