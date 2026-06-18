@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,500;1,600&amp;display=swap');
+    </style>
+  </defs>
+
+  <!-- Fundo charcoal -->
+  <rect width="500" height="500" fill="#1C2220"/>
+
+  <!-- Elemento botânico — par de folhas + caule + broto -->
+  <g transform="translate(250, 190)">
+    <!-- Caule central -->
+    <line x1="0" y1="32" x2="0" y2="-8"
+      stroke="#C4715A" stroke-width="1.4" stroke-linecap="round" opacity="0.9"/>
+    <!-- Folha esquerda -->
+    <path d="M 0,24 C -20,12 -24,0 -16,-8 C -7,-2 0,10 0,24 Z"
+      fill="#C4715A" opacity="0.65"/>
+    <!-- Folha direita -->
+    <path d="M 0,24 C 20,12 24,0 16,-8 C 7,-2 0,10 0,24 Z"
+      fill="#C4715A" opacity="0.65"/>
+    <!-- Broto superior -->
+    <ellipse cx="0" cy="-12" rx="3.5" ry="5"
+      fill="#C4715A" opacity="0.9"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text
+    x="250"
+    y="302"
+    font-family="'Playfair Display', Georgia, 'Times New Roman', serif"
+    font-style="italic"
+    font-weight="600"
+    font-size="112"
+    fill="#C4715A"
+    text-anchor="middle"
+  >Flore</text>
+
+  <!-- Linha divisória fina -->
+  <line x1="165" y1="322" x2="335" y2="322"
+    stroke="#C4715A" stroke-width="0.7" opacity="0.3"/>
+
+  <!-- Tagline -->
+  <text
+    x="250"
+    y="349"
+    font-family="'Playfair Display', Georgia, serif"
+    font-style="italic"
+    font-weight="400"
+    font-size="16"
+    fill="#6B7B64"
+    text-anchor="middle"
+    letter-spacing="2.5"
+  >agenda · clínica</text>
+</svg>
