@@ -37,7 +37,8 @@ function LoginContent() {
 
   function handleGoogle() {
     startTransition(async () => {
-      await signIn('google', { callbackUrl: '/cliente/inicio' })
+      const next = params.get('callbackUrl') ?? '/cliente/inicio'
+      await signIn('google', { callbackUrl: next })
     })
   }
 
