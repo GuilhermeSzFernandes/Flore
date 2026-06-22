@@ -24,24 +24,28 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: 'Senha',   type: 'password' },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null
+        try {
+          if (!credentials?.email || !credentials?.password) return null
 
-        const user = await db.query.users.findFirst({
-          where: eq(users.email, credentials.email as string),
-        })
+          const user = await db.query.users.findFirst({
+            where: eq(users.email, credentials.email as string),
+          })
 
-        if (!user?.passwordHash) return null
-        if (user.role !== 'professional' && user.role !== 'admin') return null
+          if (!user?.passwordHash) return null
+          if (user.role !== 'professional' && user.role !== 'admin') return null
 
-        const valid = await bcrypt.compare(credentials.password as string, user.passwordHash)
-        if (!valid) return null
+          const valid = await bcrypt.compare(credentials.password as string, user.passwordHash)
+          if (!valid) return null
 
-        return {
-          id:    user.id,
-          email: user.email,
-          name:  user.name,
-          image: user.image,
-          role:  user.role as 'professional' | 'admin',
+          return {
+            id:    user.id,
+            email: user.email,
+            name:  user.name,
+            image: user.image,
+            role:  user.role as 'professional' | 'admin',
+          }
+        } catch {
+          return null
         }
       },
     }),
