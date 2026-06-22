@@ -2,7 +2,7 @@
 
 import { auth } from '@/auth'
 import { db } from '@/db'
-import { professionals, services } from '@/db/schema'
+import { professionals, services, users } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
 
@@ -45,6 +45,14 @@ async function getUniqueConnectCode(): Promise<string> {
   while (true) {
     const code = generateConnectCode()
     const exists = await db.query.professionals.findFirst({ where: eq(professionals.connectCode, code) })
+    if (!exists) return code
+  }
+}
+
+async function getUniqueReferralCode(): Promise<string> {
+  while (true) {
+    const code = generateConnectCode()
+    const exists = await db.query.professionals.findFirst({ where: eq(professionals.referralCode, code) })
     if (!exists) return code
   }
 }
@@ -93,7 +101,22 @@ export async function completeOnboarding(formData: FormData) {
 
   const baseSlug    = generateSlug(displayName)
   const slug        = await getUniqueSlug(baseSlug)
-  const connectCode = await getUniqueConnectCode()
+  const connectCode  = await getUniqueConnectCode()
+  const referralCode = await getUniqueReferralCode()
+
+  // Resolve quem indicou este profissional
+  const dbUser = await db.query.users.findFirst({
+    where: eq(users.id, session.user.id),
+    columns: { referredByCode: true },
+  })
+  let referredById: string | null = null
+  if (dbUser?.referredByCode) {
+    const referrer = await db.query.professionals.findFirst({
+      where: eq(professionals.referralCode, dbUser.referredByCode),
+      columns: { id: true },
+    })
+    referredById = referrer?.id ?? null
+  }
 
   const [professional] = await db
     .insert(professionals)
@@ -110,6 +133,8 @@ export async function completeOnboarding(formData: FormData) {
       teamSize:      teamSize      || null,
       homeVisits:    homeVisitsRaw !== null ? homeVisitsRaw === 'true' : null,
       connectCode,
+      referralCode,
+      referredById,
     })
     .returning({ id: professionals.id })
 

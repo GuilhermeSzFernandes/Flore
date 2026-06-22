@@ -16,10 +16,11 @@ export const users = pgTable('users', {
   email:         text('email').unique(),
   emailVerified: timestamp('email_verified', { mode: 'date' }),
   image:         text('image'),
-  role:          text('role', { enum: ['professional', 'patient', 'admin'] }).notNull().default('patient'),
-  passwordHash:  text('password_hash'),
-  phone:         text('phone'),
-  onboardedAt:   timestamp('onboarded_at', { mode: 'date' }),
+  role:             text('role', { enum: ['professional', 'patient', 'admin'] }).notNull().default('patient'),
+  passwordHash:     text('password_hash'),
+  phone:            text('phone'),
+  onboardedAt:      timestamp('onboarded_at', { mode: 'date' }),
+  referredByCode:   text('referred_by_code'),
 })
 
 export const accounts = pgTable('accounts', {
@@ -62,6 +63,8 @@ export const professionals = pgTable('professionals', {
   teamSize:      text('team_size', { enum: ['solo', 'up_to_5', 'more_than_10'] }),
   homeVisits:          boolean('home_visits'),
   connectCode:         text('connect_code').unique(),
+  referralCode:        text('referral_code').unique(),
+  referredById:        text('referred_by_id'),
   businessName:        text('business_name'),
   businessDescription: text('business_description'),
   address:             text('address'),

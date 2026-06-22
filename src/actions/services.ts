@@ -32,6 +32,20 @@ export async function ensureConnectCode(professionalId: string): Promise<Profess
   }
 }
 
+export async function ensureReferralCode(professionalId: string): Promise<Professional> {
+  while (true) {
+    const code = generateConnectCode()
+    const exists = await db.query.professionals.findFirst({ where: eq(professionals.referralCode, code) })
+    if (exists) continue
+    const [updated] = await db
+      .update(professionals)
+      .set({ referralCode: code })
+      .where(eq(professionals.id, professionalId))
+      .returning()
+    return updated
+  }
+}
+
 export async function createService(formData: FormData) {
   const session = await auth()
   if (!session?.user?.id) return { success: false, error: 'Não autenticado' }

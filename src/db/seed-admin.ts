@@ -19,14 +19,12 @@ async function main() {
   })
 
   if (existing) {
-    if (existing.role !== 'admin') {
-      await db.update(schema.users)
-        .set({ role: 'admin', passwordHash: await bcrypt.hash(password, 12) })
-        .where(eq(schema.users.id, existing.id))
-      console.log(`Usuário existente promovido a admin: ${email}`)
-    } else {
-      console.log(`Admin já existe: ${email}`)
-    }
+    await db.update(schema.users)
+      .set({ role: 'admin', passwordHash: await bcrypt.hash(password, 12) })
+      .where(eq(schema.users.id, existing.id))
+    console.log(`✓ Senha do admin atualizada!`)
+    console.log(`  E-mail: ${email}`)
+    console.log(`  Senha:  ${password}`)
     return
   }
 

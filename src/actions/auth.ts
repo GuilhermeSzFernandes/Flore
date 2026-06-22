@@ -1,7 +1,7 @@
 'use server'
 
 import { db } from '@/db'
-import { users } from '@/db/schema'
+import { users, professionals } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import bcrypt from 'bcryptjs'
 import { redirect } from 'next/navigation'
@@ -12,7 +12,7 @@ export async function registerProfessional(
   const name       = (formData.get('name')       as string)?.trim()
   const email      = (formData.get('email')      as string)?.trim().toLowerCase()
   const password   = formData.get('password')   as string
-  const inviteCode = (formData.get('inviteCode') as string)?.trim().toUpperCase()
+  const accessCode = (formData.get('accessCode') as string)?.trim().toUpperCase()
 
   if (!name || !email || !password) {
     return { success: false, error: 'Preencha todos os campos obrigatórios.' }
@@ -20,12 +20,28 @@ export async function registerProfessional(
   if (password.length < 8) {
     return { success: false, error: 'A senha deve ter pelo menos 8 caracteres.' }
   }
+  if (!accessCode) {
+    return { success: false, error: 'Informe um código de acesso ou indicação.' }
+  }
 
-  const validCodes = (process.env.INVITE_CODES ?? '')
+  // Verifica se é um código Flore (env var) OU código de indicação de profissional
+  const floreCodes = (process.env.INVITE_CODES ?? '')
     .split(',')
     .map(c => c.trim().toUpperCase())
-  if (!validCodes.includes(inviteCode)) {
-    return { success: false, error: 'Código de convite inválido.' }
+    .filter(Boolean)
+
+  const isFloreCode = floreCodes.includes(accessCode)
+
+  let referredByCode: string | null = null
+  if (!isFloreCode) {
+    const referrer = await db.query.professionals.findFirst({
+      where: eq(professionals.referralCode, accessCode),
+      columns: { id: true },
+    })
+    if (!referrer) {
+      return { success: false, error: 'Código de acesso ou indicação inválido.' }
+    }
+    referredByCode = accessCode
   }
 
   const existing = await db.query.users.findFirst({ where: eq(users.email, email) })
@@ -38,9 +54,20 @@ export async function registerProfessional(
   await db.insert(users).values({
     name,
     email,
-    role:         'professional',
+    role:           'professional',
     passwordHash,
+    referredByCode,
   })
 
   redirect('/login?registered=1')
+}
+
+/** Busca o nome do profissional que possui o código de indicação (para exibir no registro). */
+export async function getReferrerByCode(code: string) {
+  if (!code || code.length !== 6) return null
+  const pro = await db.query.professionals.findFirst({
+    where: eq(professionals.referralCode, code.toUpperCase()),
+    columns: { displayName: true, businessName: true },
+  })
+  return pro ?? null
 }

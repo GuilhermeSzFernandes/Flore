@@ -1,14 +1,15 @@
 import { auth } from '@/auth'
 import { db } from '@/db'
 import { professionals, services } from '@/db/schema'
-import { eq } from 'drizzle-orm'
+import { eq, count } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { createService, toggleService, ensureConnectCode } from '@/actions/services'
+import { createService, toggleService, ensureConnectCode, ensureReferralCode } from '@/actions/services'
 import { getAppUrl } from '@/lib/app-url'
 import ProfileForm from './ProfileForm'
+import ReferralCodeCard from './ReferralCodeCard'
 
 const planLabels: Record<string, string> = {
   beta: 'Beta', free: 'Gratuito', pro: 'Pro', clinic: 'Clínica',
@@ -23,18 +24,28 @@ export default async function ConfiguracoesPage() {
   })
   if (!professional) redirect('/onboarding')
 
-  // Garante que profissionais antigas tenham um código
+  // Garante que profissionais antigas tenham os dois códigos
   if (!professional.connectCode) {
     professional = await ensureConnectCode(professional.id)
   }
+  if (!professional.referralCode) {
+    professional = await ensureReferralCode(professional.id)
+  }
+
+  // Contagem de profissionais indicadas por esta
+  const [{ referralCount }] = await db
+    .select({ referralCount: count() })
+    .from(professionals)
+    .where(eq(professionals.referredById, professional.id))
 
   const allServices = await db.query.services.findMany({
     where: eq(services.professionalId, professional.id),
     orderBy: (t, { asc }) => [asc(t.name)],
   })
 
-  const appUrl      = await getAppUrl()
-  const connectLink = `${appUrl}/conectar/${professional.connectCode ?? ''}`
+  const appUrl       = await getAppUrl()
+  const connectLink  = `${appUrl}/conectar/${professional.connectCode ?? ''}`
+  const referralLink = `${appUrl}/registro?ref=${professional.referralCode ?? ''}`
 
   return (
     <div className="p-8 max-w-2xl mx-auto space-y-8">
@@ -104,6 +115,19 @@ export default async function ConfiguracoesPage() {
             </form>
           </div>
         </div>
+      </section>
+
+      {/* Indicações */}
+      <section>
+        <h2 className="text-sm font-semibold text-foreground mb-1">Código de indicação</h2>
+        <p className="text-xs text-muted-foreground mb-4">
+          Compartilhe este link para convidar outras profissionais para o beta. Cada cadastro feito com seu código é registrado.
+        </p>
+        <ReferralCodeCard
+          code={professional.referralCode ?? ''}
+          link={referralLink}
+          count={Number(referralCount)}
+        />
       </section>
 
       {/* Plano */}

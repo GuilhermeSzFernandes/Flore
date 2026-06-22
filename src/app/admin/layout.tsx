@@ -2,11 +2,12 @@ import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { signOut } from '@/auth'
 import Link from 'next/link'
-import { LayoutDashboard, Users, LogOut, MessageSquareWarning } from 'lucide-react'
+import { LayoutDashboard, Users, LogOut, MessageSquareWarning, GitBranch } from 'lucide-react'
 
 const navItems = [
   { href: '/admin',               label: 'Dashboard',      icon: LayoutDashboard },
   { href: '/admin/profissionais', label: 'Profissionais',  icon: Users },
+  { href: '/admin/indicacoes',    label: 'Indicações',     icon: GitBranch },
   { href: '/admin/feedback',      label: 'Feedback',       icon: MessageSquareWarning },
 ]
 
