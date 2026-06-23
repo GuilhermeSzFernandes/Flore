@@ -53,7 +53,7 @@ export default async function DashboardPage() {
      (professional.monthlyVolume === 'around50' && professional.teamSize === 'up_to_5'))
 
   return (
-    <div className="p-8 max-w-2xl mx-auto">
+    <div className="p-4 md:p-8 max-w-2xl mx-auto">
       {/* Banner de upgrade */}
       {suggestUpgrade && (
         <div className="mb-6 rounded-xl border px-5 py-4 flex items-center gap-4"

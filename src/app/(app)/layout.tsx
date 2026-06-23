@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { LogOut } from 'lucide-react'
 import { SidebarNav } from './SidebarNav'
+import { BottomNav } from './BottomNav'
 import FeedbackFAB from '@/components/FeedbackFAB'
 
 const planLabels: Record<string, string> = {
@@ -33,8 +34,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      {/* Sidebar */}
-      <aside className="w-56 flex flex-col shrink-0 h-screen sticky top-0" style={{ background: 'var(--sidebar)' }}>
+      {/* Sidebar — visível apenas em md+ */}
+      <aside className="hidden md:flex w-56 flex-col shrink-0 h-screen sticky top-0" style={{ background: 'var(--sidebar)' }}>
 
         {/* Wordmark */}
         <div className="px-6 pt-7 pb-6">
@@ -49,7 +50,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         {/* Nav */}
         <SidebarNav />
 
-        {/* Divisor + Leaf */}
+        {/* Divisor */}
         <div className="px-6 py-3 opacity-20">
           <div className="border-t" style={{ borderColor: 'var(--sidebar-border)' }} />
         </div>
@@ -96,10 +97,62 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
 
-      {/* Main */}
-      <main className="flex-1 overflow-auto h-screen">
-        {children}
-      </main>
+      {/* Coluna direita — ocupa toda a tela no mobile */}
+      <div className="flex-1 flex flex-col min-w-0 h-screen">
+        {/* Header mobile — oculto em md+ */}
+        <header
+          className="md:hidden sticky top-0 z-20 flex items-center justify-between px-4 h-13 border-b border-border bg-background shrink-0"
+        >
+          <span
+            className="font-display italic text-xl tracking-tight"
+            style={{ color: 'var(--primary)' }}
+          >
+            Flore
+          </span>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Avatar className="w-8 h-8">
+                <AvatarImage src={session.user.image ?? ''} />
+                <AvatarFallback
+                  className="text-xs font-medium"
+                  style={{ background: 'var(--sidebar)', color: 'var(--sidebar-foreground)' }}
+                >
+                  {professional.displayName.slice(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="bottom" align="end" className="w-48">
+              <div className="px-3 py-2 border-b border-border mb-1">
+                <p className="text-xs font-medium truncate">{professional.displayName}</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">{planLabels[professional.plan]}</p>
+              </div>
+              <DropdownMenuItem>
+                <form
+                  action={async () => {
+                    'use server'
+                    await signOut({ redirectTo: '/login' })
+                  }}
+                  className="w-full"
+                >
+                  <button type="submit" className="flex items-center gap-2 w-full text-sm text-destructive">
+                    <LogOut className="w-3.5 h-3.5" />
+                    Sair
+                  </button>
+                </form>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </header>
+
+        {/* Conteúdo — padding bottom no mobile para não ficar atrás do bottom nav */}
+        <main className="flex-1 min-h-0 overflow-auto pb-16 md:pb-0">
+          {children}
+        </main>
+      </div>
+
+      {/* Bottom nav — apenas mobile */}
+      <BottomNav />
 
       <FeedbackFAB />
     </div>

@@ -96,6 +96,8 @@ export async function completeOnboarding(formData: FormData) {
   const monthlyVolume = formData.get('monthlyVolume') as MonthlyVolume | null
   const teamSize      = formData.get('teamSize') as TeamSize | null
   const homeVisitsRaw = formData.get('homeVisits') as string | null
+  const latRaw        = formData.get('latitude')  as string | null
+  const lngRaw        = formData.get('longitude') as string | null
 
   if (!displayName) return { success: false, error: 'Nome é obrigatório' }
 
@@ -132,6 +134,8 @@ export async function completeOnboarding(formData: FormData) {
       monthlyVolume: monthlyVolume || null,
       teamSize:      teamSize      || null,
       homeVisits:    homeVisitsRaw !== null ? homeVisitsRaw === 'true' : null,
+      latitude:      latRaw  ? parseFloat(latRaw)  : null,
+      longitude:     lngRaw  ? parseFloat(lngRaw)  : null,
       connectCode,
       referralCode,
       referredById,

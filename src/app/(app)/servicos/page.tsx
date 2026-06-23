@@ -33,7 +33,7 @@ export default async function ServicosPage() {
   ])
 
   return (
-    <div className="p-8 max-w-2xl mx-auto space-y-10">
+    <div className="p-4 md:p-8 max-w-2xl mx-auto space-y-10">
       <div>
         <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground mb-1">Negócio</p>
         <h1 className="text-3xl font-display font-semibold text-foreground">Meus Serviços</h1>

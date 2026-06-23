@@ -123,6 +123,9 @@ export async function updateProfessional(formData: FormData) {
   const displayName  = formData.get('displayName') as string
   const phone        = formData.get('phone') as string
   const businessName = (formData.get('businessName') as string)?.trim() || null
+  const address      = (formData.get('address') as string)?.trim() || null
+  const latRaw       = formData.get('latitude')  as string | null
+  const lngRaw       = formData.get('longitude') as string | null
 
   await db
     .update(professionals)
@@ -130,6 +133,8 @@ export async function updateProfessional(formData: FormData) {
       displayName:  displayName?.trim() || professional.displayName,
       phone:        phone?.replace(/\D/g, '') || null,
       businessName,
+      address,
+      ...(latRaw && lngRaw ? { latitude: parseFloat(latRaw), longitude: parseFloat(lngRaw) } : {}),
     })
     .where(eq(professionals.id, professional.id))
 

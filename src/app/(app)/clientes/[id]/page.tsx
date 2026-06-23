@@ -50,7 +50,7 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
   const phoneFormatted = client.phone.replace(/(\d{2})(\d{4,5})(\d{4})/, '($1) $2-$3')
 
   return (
-    <div className="p-8 max-w-3xl mx-auto">
+    <div className="p-4 md:p-8 max-w-3xl mx-auto">
       {/* Breadcrumb */}
       <Link href="/clientes" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
         <ArrowLeft className="w-3.5 h-3.5" />

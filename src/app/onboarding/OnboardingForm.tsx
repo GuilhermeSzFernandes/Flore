@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label'
 import { completeOnboarding } from '@/actions/onboarding'
 import { toast } from 'sonner'
 import { ChevronRight, ChevronLeft, Check } from 'lucide-react'
+import AddressAutocomplete from '@/components/AddressAutocomplete'
 
 type Specialty    = 'manicure' | 'hairdresser' | 'massagist' | 'esthetician' | 'other'
 type MonthlyVolume = 'lt20' | 'around50' | 'around100'
@@ -62,6 +63,8 @@ export default function OnboardingForm({ defaultName }: Props) {
   const [businessName, setBusinessName] = useState('')
   const [phone, setPhone]               = useState('')
   const [address, setAddress]           = useState('')
+  const [latitude, setLatitude]         = useState<number | null>(null)
+  const [longitude, setLongitude]       = useState<number | null>(null)
   const [specialty, setSpecialty]       = useState<Specialty | null>(null)
   const [monthlyVolume, setMonthlyVolume] = useState<MonthlyVolume | null>(null)
   const [teamSize, setTeamSize]       = useState<TeamSize | null>(null)
@@ -82,6 +85,8 @@ export default function OnboardingForm({ defaultName }: Props) {
     fd.set('businessName',  businessName.trim())
     fd.set('phone',         phone)
     fd.set('address',       address.trim())
+    if (latitude  !== null) fd.set('latitude',  String(latitude))
+    if (longitude !== null) fd.set('longitude', String(longitude))
     if (specialty)     fd.set('specialty',     specialty)
     if (monthlyVolume) fd.set('monthlyVolume', monthlyVolume)
     if (teamSize)      fd.set('teamSize',      teamSize)
@@ -168,13 +173,15 @@ export default function OnboardingForm({ defaultName }: Props) {
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="address" className="text-sm font-medium">Endereço do local</Label>
-            <Input
-              id="address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="Rua, número, bairro — cidade"
-              className="h-10"
+            <Label className="text-sm font-medium">Endereço do local</Label>
+            <AddressAutocomplete
+              defaultValue={address}
+              disabled={isPending}
+              onSelect={({ address: a, latitude: lat, longitude: lng }) => {
+                setAddress(a)
+                setLatitude(lat)
+                setLongitude(lng)
+              }}
             />
             <p className="text-xs" style={{ color: 'oklch(0.60 0.010 155)' }}>
               Visível para seus clientes no painel deles.

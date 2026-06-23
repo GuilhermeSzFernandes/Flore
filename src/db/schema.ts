@@ -4,6 +4,7 @@ import {
   timestamp,
   boolean,
   integer,
+  real,
   primaryKey,
 } from 'drizzle-orm/pg-core'
 import type { AdapterAccountType } from 'next-auth/adapters'
@@ -69,6 +70,8 @@ export const professionals = pgTable('professionals', {
   businessName:        text('business_name'),
   businessDescription: text('business_description'),
   address:             text('address'),
+  latitude:            real('latitude'),
+  longitude:           real('longitude'),
   workingHours:        text('working_hours'),
   lunchBreak:          text('lunch_break'),    // JSON: {"start":"HH:MM","end":"HH:MM"} | null
   createdAt:           timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),

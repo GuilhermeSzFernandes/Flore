@@ -48,7 +48,7 @@ export default async function ConfiguracoesPage() {
   const referralLink = `${appUrl}/registro?ref=${professional.referralCode ?? ''}`
 
   return (
-    <div className="p-8 max-w-2xl mx-auto space-y-8">
+    <div className="p-4 md:p-8 max-w-2xl mx-auto space-y-8">
       <div>
         <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground mb-1">Conta</p>
         <h1 className="text-3xl font-display font-semibold text-foreground">Configurações</h1>
@@ -62,6 +62,7 @@ export default async function ConfiguracoesPage() {
             displayName={professional.displayName}
             phone={professional.phone ?? ''}
             businessName={professional.businessName ?? ''}
+            address={professional.address ?? ''}
             connectCode={professional.connectCode ?? ''}
             connectLink={connectLink}
           />

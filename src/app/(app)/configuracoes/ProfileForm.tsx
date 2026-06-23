@@ -8,20 +8,25 @@ import { updateProfessional } from '@/actions/services'
 import { toast } from 'sonner'
 import { Pencil, X } from 'lucide-react'
 import CopyLinkButton from './CopyLinkButton'
+import AddressAutocomplete from '@/components/AddressAutocomplete'
 
 interface Props {
   displayName: string
   phone: string
   businessName: string
+  address: string
   connectCode: string
   connectLink: string
 }
 
-export default function ProfileForm({ displayName, phone, businessName, connectCode, connectLink }: Props) {
+export default function ProfileForm({ displayName, phone, businessName, address, connectCode, connectLink }: Props) {
   const [editing, setEditing]  = useState(false)
   const [name, setName]        = useState(displayName)
   const [biz, setBiz]          = useState(businessName)
   const [tel, setTel]          = useState(phone)
+  const [addr, setAddr]        = useState(address)
+  const [lat, setLat]          = useState<number | null>(null)
+  const [lng, setLng]          = useState<number | null>(null)
   const [isPending, start]     = useTransition()
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -30,6 +35,9 @@ export default function ProfileForm({ displayName, phone, businessName, connectC
     fd.set('displayName',  name.trim())
     fd.set('businessName', biz.trim())
     fd.set('phone',        tel)
+    fd.set('address',      addr.trim())
+    if (lat !== null) fd.set('latitude',  String(lat))
+    if (lng !== null) fd.set('longitude', String(lng))
     start(async () => {
       const result = await updateProfessional(fd)
       if (!result.success) { toast.error(result.error ?? 'Erro ao salvar'); return }
@@ -42,6 +50,9 @@ export default function ProfileForm({ displayName, phone, businessName, connectC
     setName(displayName)
     setBiz(businessName)
     setTel(phone)
+    setAddr(address)
+    setLat(null)
+    setLng(null)
     setEditing(false)
   }
 
@@ -77,6 +88,12 @@ export default function ProfileForm({ displayName, phone, businessName, connectC
                 Nome do negócio
               </p>
               <p className="text-sm font-medium text-foreground">{biz || <span className="text-muted-foreground italic">Usando nome profissional</span>}</p>
+            </div>
+            <div className="col-span-2">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">
+                Endereço
+              </p>
+              <p className="text-sm font-medium text-foreground">{addr || <span className="text-muted-foreground italic">Não informado</span>}</p>
             </div>
           </div>
         </div>
@@ -125,6 +142,21 @@ export default function ProfileForm({ displayName, phone, businessName, connectC
         />
         <p className="text-xs text-muted-foreground">
           Deixe em branco para usar seu nome profissional.
+        </p>
+      </div>
+      <div className="space-y-1.5">
+        <Label className="text-sm font-medium">Endereço do local</Label>
+        <AddressAutocomplete
+          defaultValue={addr}
+          disabled={isPending}
+          onSelect={({ address: a, latitude: newLat, longitude: newLng }) => {
+            setAddr(a)
+            setLat(newLat)
+            setLng(newLng)
+          }}
+        />
+        <p className="text-xs text-muted-foreground">
+          Usado para clientes encontrarem profissionais próximas.
         </p>
       </div>
       <div className="flex items-center gap-2 pt-2 border-t border-border">

@@ -21,7 +21,7 @@ export default async function NovoClientePage() {
   if (!professional) redirect('/onboarding')
 
   return (
-    <div className="p-8 max-w-xl mx-auto">
+    <div className="p-4 md:p-8 max-w-xl mx-auto">
       <Link href="/clientes" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
         <ArrowLeft className="w-3.5 h-3.5" />
         Clientes

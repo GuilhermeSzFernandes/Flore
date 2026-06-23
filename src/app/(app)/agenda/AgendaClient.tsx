@@ -209,9 +209,9 @@ export default function AgendaClient({ appointments, services, professional, vie
     : [date]
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-background">
+    <div className="flex flex-col h-full overflow-hidden bg-background">
       {/* Toolbar */}
-      <div className="px-6 py-4 border-b border-border bg-card flex items-center gap-4">
+      <div className="px-3 md:px-6 py-3 border-b border-border bg-card flex flex-wrap items-center gap-2">
         <div className="flex items-center gap-1">
           <Button variant="outline" size="sm" className="h-8 w-8 p-0" onClick={() => navigate('prev')}>
             <ChevronLeft className="w-4 h-4" />
@@ -224,27 +224,29 @@ export default function AgendaClient({ appointments, services, professional, vie
           </Button>
         </div>
 
-        <h2 className="font-display font-medium text-foreground capitalize text-sm flex-1">
+        <h2 className="font-display font-medium text-foreground capitalize text-xs md:text-sm flex-1 min-w-0 truncate">
           {view === 'day'
-            ? format(date, "EEEE, d 'de' MMMM yyyy", { locale: ptBR })
+            ? format(date, "EEE, d 'de' MMMM", { locale: ptBR })
             : `Semana de ${format(startOfWeek(date, { weekStartsOn: 0 }), "d 'de' MMMM", { locale: ptBR })}`}
         </h2>
 
-        <div className="flex gap-1">
-          <Button size="sm" variant={view === 'day' ? 'default' : 'outline'} className="h-8 px-3 text-xs"
-            onClick={() => router.push(`/agenda?view=day&date=${dateStr}`)}>
-            Dia
-          </Button>
-          <Button size="sm" variant={view === 'week' ? 'default' : 'outline'} className="h-8 px-3 text-xs"
-            onClick={() => router.push(`/agenda?view=week&date=${dateStr}`)}>
-            Semana
+        <div className="flex items-center gap-1 ml-auto">
+          <div className="flex gap-1">
+            <Button size="sm" variant={view === 'day' ? 'default' : 'outline'} className="h-8 px-3 text-xs"
+              onClick={() => router.push(`/agenda?view=day&date=${dateStr}`)}>
+              Dia
+            </Button>
+            <Button size="sm" variant={view === 'week' ? 'default' : 'outline'} className="h-8 px-3 text-xs"
+              onClick={() => router.push(`/agenda?view=week&date=${dateStr}`)}>
+              Semana
+            </Button>
+          </div>
+
+          <Button size="sm" className="h-8 gap-1.5 text-xs" onClick={() => { setSlotDate(new Date().toISOString()); setNewDialog(true) }}>
+            <Plus className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Novo</span>
           </Button>
         </div>
-
-        <Button size="sm" className="h-8 gap-1.5 text-xs" onClick={() => { setSlotDate(new Date().toISOString()); setNewDialog(true) }}>
-          <Plus className="w-3.5 h-3.5" />
-          Novo
-        </Button>
       </div>
 
       {/* Grid */}
