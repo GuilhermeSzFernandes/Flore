@@ -127,6 +127,7 @@ export default async function ConfiguracoesPage() {
           code={professional.referralCode ?? ''}
           link={referralLink}
           count={Number(referralCount)}
+          proWeeks={professional.referralProWeeks}
         />
       </section>
 
@@ -136,7 +137,11 @@ export default async function ConfiguracoesPage() {
         <div className="bg-card rounded-xl border border-border p-6 flex items-center justify-between">
           <div>
             <p className="font-medium text-foreground">{planLabels[professional.plan]}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">30 agendamentos/mês · 30 clientes</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {professional.referralProWeeks > 0
+                ? `${professional.referralProWeeks} ${professional.referralProWeeks === 1 ? 'semana' : 'semanas'} de Pro aguardando lançamento`
+                : 'Indique profissionais para ganhar semanas de Pro'}
+            </p>
           </div>
           <Button variant="outline" size="sm" disabled className="text-xs">
             Upgrade em breve

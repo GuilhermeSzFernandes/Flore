@@ -65,6 +65,7 @@ export const professionals = pgTable('professionals', {
   connectCode:         text('connect_code').unique(),
   referralCode:        text('referral_code').unique(),
   referredById:        text('referred_by_id'),
+  referralProWeeks:    integer('referral_pro_weeks').default(0).notNull(),
   businessName:        text('business_name'),
   businessDescription: text('business_description'),
   address:             text('address'),

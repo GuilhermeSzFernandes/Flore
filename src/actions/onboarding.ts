@@ -3,7 +3,7 @@
 import { auth } from '@/auth'
 import { db } from '@/db'
 import { professionals, services, users } from '@/db/schema'
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
 
 type Specialty = 'manicure' | 'hairdresser' | 'massagist' | 'esthetician' | 'other'
@@ -137,6 +137,14 @@ export async function completeOnboarding(formData: FormData) {
       referredById,
     })
     .returning({ id: professionals.id })
+
+  // Creditar 1 semana de Pro ao indicador (máximo 5)
+  if (referredById) {
+    await db
+      .update(professionals)
+      .set({ referralProWeeks: sql`LEAST(referral_pro_weeks + 1, 5)` })
+      .where(eq(professionals.id, referredById))
+  }
 
   // Criar serviços padrão conforme a especialidade
   const defaultSvcs = DEFAULT_SERVICES[specialty ?? 'other']

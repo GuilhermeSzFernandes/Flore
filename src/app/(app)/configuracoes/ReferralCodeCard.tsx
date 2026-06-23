@@ -2,15 +2,16 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Copy, Check, Users } from 'lucide-react'
+import { Copy, Check, Users, Gift } from 'lucide-react'
 
 interface Props {
   code: string
   link: string
   count: number
+  proWeeks: number
 }
 
-export default function ReferralCodeCard({ code, link, count }: Props) {
+export default function ReferralCodeCard({ code, link, count, proWeeks }: Props) {
   const [copiedCode, setCopiedCode] = useState(false)
   const [copiedLink, setCopiedLink] = useState(false)
 
@@ -40,6 +41,21 @@ export default function ReferralCodeCard({ code, link, count }: Props) {
           </p>
         </div>
       </div>
+
+      {/* Semanas de Pro acumuladas */}
+      {proWeeks > 0 && (
+        <div className="flex items-center gap-3 rounded-lg px-4 py-3"
+          style={{ background: 'oklch(0.575 0.115 27 / 8%)', border: '1px solid oklch(0.575 0.115 27 / 20%)' }}>
+          <Gift className="w-4 h-4 shrink-0" style={{ color: 'oklch(0.575 0.115 27)' }} />
+          <div className="flex-1">
+            <p className="text-xs font-semibold" style={{ color: 'oklch(0.575 0.115 27)' }}>
+              {proWeeks} {proWeeks === 1 ? 'semana' : 'semanas'} de Pro acumulada{proWeeks === 1 ? '' : 's'}
+              {proWeeks < 5 && <span className="font-normal text-muted-foreground"> · até {5 - proWeeks} mais</span>}
+            </p>
+            <p className="text-xs text-muted-foreground">Aplicadas automaticamente quando o plano Pro for lançado.</p>
+          </div>
+        </div>
+      )}
 
       {/* Código */}
       <div className="space-y-1.5">
