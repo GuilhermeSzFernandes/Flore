@@ -1,5 +1,3 @@
-import Image from 'next/image'
-
 interface Props {
   size?: number
   showText?: boolean
@@ -15,7 +13,8 @@ export default function FloreLogo({
 }: Props) {
   return (
     <span className="inline-flex items-center gap-2">
-      <Image
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         src="/logotipo.png"
         alt="Flore"
         width={size}

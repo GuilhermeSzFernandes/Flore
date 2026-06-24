@@ -27,6 +27,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-full">
         {children}
         <Toaster richColors position="top-right" />
+        {/* TEMPORÁRIO — remover após diagnóstico */}
+        <script src="//cdn.jsdelivr.net/npm/eruda" />
+        <script dangerouslySetInnerHTML={{ __html: 'eruda.init()' }} />
       </body>
     </html>
   )
