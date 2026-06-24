@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 import { UserCheck } from 'lucide-react'
+import FloreLogo from '@/components/FloreLogo'
 
 interface Props {
   refCode?: string
@@ -38,7 +39,7 @@ export default function RegistroForm({ refCode = '', referrerName }: Props) {
         className="hidden lg:flex w-[44%] flex-col justify-between p-12"
         style={{ background: 'var(--foreground)' }}
       >
-        <span className="font-display italic text-3xl" style={{ color: 'var(--primary)' }}>Flore</span>
+        <FloreLogo size={32} textClassName="font-display italic text-3xl" textColor="var(--primary)" />
         <div className="space-y-4">
           <p className="text-4xl font-display italic leading-snug" style={{ color: 'oklch(0.88 0.01 80)' }}>
             Crie sua conta.<br />Configure em minutos.<br />Comece a atender.
@@ -56,7 +57,7 @@ export default function RegistroForm({ refCode = '', referrerName }: Props) {
       <div className="flex-1 flex items-center justify-center p-8 bg-background">
         <div className="w-full max-w-sm space-y-7">
           <div className="lg:hidden mb-2">
-            <span className="font-display italic text-3xl text-primary">Flore</span>
+            <FloreLogo size={28} textClassName="font-display italic text-3xl text-primary" />
           </div>
 
           <div className="space-y-1">

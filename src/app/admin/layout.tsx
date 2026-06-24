@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { signOut } from '@/auth'
 import Link from 'next/link'
 import { LayoutDashboard, Users, LogOut, MessageSquareWarning, GitBranch } from 'lucide-react'
+import FloreLogo from '@/components/FloreLogo'
 
 const navItems = [
   { href: '/admin',               label: 'Dashboard',      icon: LayoutDashboard },
@@ -20,7 +21,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       {/* Sidebar */}
       <aside className="w-52 flex flex-col shrink-0 border-r border-border bg-card">
         <div className="px-5 pt-6 pb-5 border-b border-border">
-          <p className="font-display italic text-xl text-primary">Flore</p>
+          <FloreLogo size={26} textClassName="font-display italic text-xl text-primary" />
           <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mt-0.5">Painel Admin</p>
         </div>
 

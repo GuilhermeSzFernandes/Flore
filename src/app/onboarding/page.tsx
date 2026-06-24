@@ -4,6 +4,7 @@ import { professionals } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
 import OnboardingForm from './OnboardingForm'
+import FloreLogo from '@/components/FloreLogo'
 
 export default async function OnboardingPage() {
   const session = await auth()
@@ -21,7 +22,7 @@ export default async function OnboardingPage() {
         className="hidden lg:flex w-64 shrink-0 flex-col justify-between p-10"
         style={{ background: 'var(--foreground)' }}
       >
-        <span className="font-display italic text-2xl" style={{ color: 'var(--primary)' }}>Flore</span>
+        <FloreLogo size={28} textClassName="font-display italic text-2xl" textColor="var(--primary)" />
         <p className="text-sm leading-relaxed font-display italic" style={{ color: 'oklch(0.60 0.02 155)' }}>
           "Cada sessão é um cuidado. Cada registro, uma história."
         </p>

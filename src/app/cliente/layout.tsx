@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import Link from 'next/link'
 import { Home, User } from 'lucide-react'
 import FeedbackFAB from '@/components/FeedbackFAB'
+import FloreLogo from '@/components/FloreLogo'
 
 const navItems = [
   { href: '/cliente/inicio', label: 'Início',     icon: Home },
@@ -21,7 +22,7 @@ export default async function ClienteLayout({ children }: { children: React.Reac
       <header
         className="sticky top-0 z-20 flex items-center justify-between px-5 h-14 border-b border-border bg-background"
       >
-        <span className="font-display italic text-xl" style={{ color: 'var(--primary)' }}>Flore</span>
+        <FloreLogo size={24} textClassName="font-display italic text-xl" textColor="var(--primary)" />
 
         {/* Nav desktop */}
         <nav className="hidden sm:flex items-center gap-1">

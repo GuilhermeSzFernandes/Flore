@@ -8,7 +8,6 @@ import { updateProfessional } from '@/actions/services'
 import { toast } from 'sonner'
 import { Pencil, X } from 'lucide-react'
 import CopyLinkButton from './CopyLinkButton'
-import AddressAutocomplete from '@/components/AddressAutocomplete'
 
 interface Props {
   displayName: string
@@ -25,8 +24,6 @@ export default function ProfileForm({ displayName, phone, businessName, address,
   const [biz, setBiz]          = useState(businessName)
   const [tel, setTel]          = useState(phone)
   const [addr, setAddr]        = useState(address)
-  const [lat, setLat]          = useState<number | null>(null)
-  const [lng, setLng]          = useState<number | null>(null)
   const [isPending, start]     = useTransition()
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -36,8 +33,6 @@ export default function ProfileForm({ displayName, phone, businessName, address,
     fd.set('businessName', biz.trim())
     fd.set('phone',        tel)
     fd.set('address',      addr.trim())
-    if (lat !== null) fd.set('latitude',  String(lat))
-    if (lng !== null) fd.set('longitude', String(lng))
     start(async () => {
       const result = await updateProfessional(fd)
       if (!result.success) { toast.error(result.error ?? 'Erro ao salvar'); return }
@@ -51,8 +46,6 @@ export default function ProfileForm({ displayName, phone, businessName, address,
     setBiz(businessName)
     setTel(phone)
     setAddr(address)
-    setLat(null)
-    setLng(null)
     setEditing(false)
   }
 
@@ -146,17 +139,15 @@ export default function ProfileForm({ displayName, phone, businessName, address,
       </div>
       <div className="space-y-1.5">
         <Label className="text-sm font-medium">Endereço do local</Label>
-        <AddressAutocomplete
-          defaultValue={addr}
+        <Input
+          value={addr}
+          onChange={e => setAddr(e.target.value)}
+          placeholder="Rua, número, bairro — cidade"
           disabled={isPending}
-          onSelect={({ address: a, latitude: newLat, longitude: newLng }) => {
-            setAddr(a)
-            setLat(newLat)
-            setLng(newLng)
-          }}
+          className="h-10"
         />
         <p className="text-xs text-muted-foreground">
-          Usado para clientes encontrarem profissionais próximas.
+          Visível para seus clientes no painel deles.
         </p>
       </div>
       <div className="flex items-center gap-2 pt-2 border-t border-border">

@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { format, addDays, isSunday, parseISO } from 'date-fns'
+import FloreLogo from '@/components/FloreLogo'
 import { ptBR } from 'date-fns/locale'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -141,9 +142,7 @@ export default function PublicBookingForm({
 
         {/* Header */}
         <div className="text-center space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'oklch(0.575 0.115 27)' }}>
-            Flore
-          </p>
+          <FloreLogo size={18} textClassName="text-xs font-semibold uppercase tracking-widest" textColor="oklch(0.575 0.115 27)" />
           <h1 className="text-3xl font-display font-semibold" style={{ color: 'oklch(0.155 0.015 155)' }}>
             {professional.displayName}
           </h1>

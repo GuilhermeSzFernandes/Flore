@@ -3,6 +3,7 @@
 import { Suspense, useState, useTransition } from 'react'
 import { signIn, getSession } from 'next-auth/react'
 import { useSearchParams } from 'next/navigation'
+import FloreLogo from '@/components/FloreLogo'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -49,9 +50,7 @@ function LoginContent() {
         className="hidden lg:flex w-[44%] flex-col justify-between p-12"
         style={{ background: 'var(--foreground)' }}
       >
-        <span className="font-display italic text-3xl" style={{ color: 'var(--primary)' }}>
-          Flore
-        </span>
+        <FloreLogo size={32} textClassName="font-display italic text-3xl" textColor="var(--primary)" />
         <div className="space-y-4">
           {tab === 'patient' ? (
             <>
@@ -82,7 +81,7 @@ function LoginContent() {
       <div className="flex-1 flex items-center justify-center p-8 bg-background">
         <div className="w-full max-w-sm space-y-7">
           <div className="lg:hidden mb-2">
-            <span className="font-display italic text-3xl text-primary">Flore</span>
+            <FloreLogo size={28} textClassName="font-display italic text-3xl text-primary" />
           </div>
 
           {registered && (

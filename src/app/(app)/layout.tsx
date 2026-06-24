@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { LogOut } from 'lucide-react'
 import { SidebarNav } from './SidebarNav'
+import FloreLogo from '@/components/FloreLogo'
 import { BottomNav } from './BottomNav'
 import FeedbackFAB from '@/components/FeedbackFAB'
 
@@ -39,12 +40,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
         {/* Wordmark */}
         <div className="px-6 pt-7 pb-6">
-          <span
-            className="font-display italic text-2xl tracking-tight"
-            style={{ color: 'var(--sidebar-primary)' }}
-          >
-            Flore
-          </span>
+          <FloreLogo size={28} textClassName="font-display italic text-2xl tracking-tight" textColor="var(--sidebar-primary)" />
         </div>
 
         {/* Nav */}
@@ -103,12 +99,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <header
           className="md:hidden sticky top-0 z-20 flex items-center justify-between px-4 h-13 border-b border-border bg-background shrink-0"
         >
-          <span
-            className="font-display italic text-xl tracking-tight"
-            style={{ color: 'var(--primary)' }}
-          >
-            Flore
-          </span>
+          <FloreLogo size={24} textClassName="font-display italic text-xl tracking-tight" textColor="var(--primary)" />
 
           <DropdownMenu>
             <DropdownMenuTrigger>

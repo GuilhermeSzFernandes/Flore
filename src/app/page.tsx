@@ -4,6 +4,7 @@ import Link from 'next/link'
 import {
   Calendar, Users, MessageCircle, FileText, Lock, Zap, ArrowRight, Check,
 } from 'lucide-react'
+import FloreLogo from '@/components/FloreLogo'
 
 export default async function LandingPage() {
   const session = await auth()
@@ -24,9 +25,7 @@ export default async function LandingPage() {
 
       {/* Nav */}
       <header className="px-6 py-5 flex items-center justify-between max-w-6xl mx-auto">
-        <span className="font-display italic text-2xl tracking-tight" style={{ color: 'oklch(0.155 0.015 155)' }}>
-          Flore
-        </span>
+        <FloreLogo size={28} textClassName="font-display italic text-2xl tracking-tight" textColor="oklch(0.155 0.015 155)" />
         <Link
           href="/login"
           className="text-sm font-medium px-4 py-2 rounded-lg border border-foreground text-foreground transition-all hover:bg-foreground hover:text-background active:scale-[0.97]"
@@ -418,7 +417,7 @@ export default async function LandingPage() {
           className="max-w-6xl mx-auto px-6 py-8 border-t flex flex-col sm:flex-row items-center justify-between gap-4"
           style={{ borderColor: 'oklch(0.215 0.012 155)' }}
         >
-          <p className="font-display italic text-lg" style={{ color: 'oklch(0.575 0.115 27)' }}>Flore</p>
+          <FloreLogo size={20} textClassName="font-display italic text-lg" textColor="oklch(0.575 0.115 27)" />
           <div className="flex items-center gap-6 text-xs" style={{ color: 'oklch(0.40 0.010 155)' }}>
             <span>© {new Date().getFullYear()} Flore · Agenda para esteticistas</span>
             <Link href="/privacidade" className="transition-opacity hover:opacity-70">Política de privacidade</Link>

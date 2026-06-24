@@ -22,7 +22,8 @@ import { createAppointment, updateAppointmentStatus } from '@/actions/appointmen
 import { createSessionNote } from '@/actions/session-notes'
 import { toast } from 'sonner'
 import { ChevronLeft, ChevronRight, AlertTriangle, Plus, Phone, FileText } from 'lucide-react'
-import type { Appointment, Restriction, Service } from '@/db/schema'
+import type { Appointment, Patient, Restriction, Service } from '@/db/schema'
+import PatientCombobox from '@/components/PatientCombobox'
 
 const HOURS = Array.from({ length: 29 }, (_, i) => {
   const totalMinutes = 7 * 60 + i * 30
@@ -86,6 +87,7 @@ type AptWithRestrictions = Appointment & { restrictions: Restriction[] }
 interface Props {
   appointments: AptWithRestrictions[]
   services: Service[]
+  patients: Patient[]
   professional: { id: string; displayName: string; specialty: string }
   view: 'day' | 'week'
   selectedDate: string
@@ -127,7 +129,7 @@ const STATUS_ACCENT: Record<Appointment['status'], string> = {
   cancelled:  'oklch(0.68 0.010 155)',
 }
 
-export default function AgendaClient({ appointments, services, professional, view, selectedDate }: Props) {
+export default function AgendaClient({ appointments, services, patients, professional, view, selectedDate }: Props) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
@@ -330,16 +332,7 @@ export default function AgendaClient({ appointments, services, professional, vie
             {/* Cliente */}
             <div className="space-y-2">
               <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Cliente</p>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label className="text-xs font-medium">Nome *</Label>
-                  <Input name="patientName" required placeholder="Maria Silva" className="h-9 text-sm" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-xs font-medium">Telefone *</Label>
-                  <Input name="patientPhone" required placeholder="(11) 99999-0000" className="h-9 text-sm" />
-                </div>
-              </div>
+              <PatientCombobox key={slotDate} patients={patients} disabled={isPending} />
             </div>
 
             {/* Serviço */}

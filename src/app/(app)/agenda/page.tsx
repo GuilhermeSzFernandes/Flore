@@ -1,6 +1,6 @@
 import { auth } from '@/auth'
 import { db } from '@/db'
-import { appointments, professionals, restrictions, services } from '@/db/schema'
+import { appointments, professionals, patients, restrictions, services } from '@/db/schema'
 import { eq, and, gte, lt } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, addDays, format, parseISO } from 'date-fns'
@@ -58,10 +58,16 @@ export default async function AgendaPage({
     orderBy: (t, { asc }) => [asc(t.name)],
   })
 
+  const allPatients = await db.query.patients.findMany({
+    where: eq(patients.professionalId, professional.id),
+    orderBy: (t, { asc }) => [asc(t.name)],
+  })
+
   return (
     <AgendaClient
       appointments={appointmentsWithRestrictions}
       services={activeServices}
+      patients={allPatients}
       professional={{ id: professional.id, displayName: professional.displayName, specialty: professional.specialty ?? 'other' }}
       view={view as 'day' | 'week'}
       selectedDate={selectedDate.toISOString()}
