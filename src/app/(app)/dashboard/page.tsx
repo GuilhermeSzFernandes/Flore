@@ -1,11 +1,10 @@
 import { auth } from '@/auth'
 import { db } from '@/db'
 import { appointments, professionals, restrictions, patients, services } from '@/db/schema'
-import { eq, and, gte, lt, lte } from 'drizzle-orm'
+import { eq, and, gte, lte } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
 import {
   format,
-  startOfDay,
   endOfDay,
   startOfMonth,
   subMonths,
@@ -15,6 +14,7 @@ import {
   isSameDay,
 } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { nowInApp, toAppTz } from '@/lib/datetime'
 import Link from 'next/link'
 import {
   CalendarCheck,
@@ -53,10 +53,13 @@ export default async function DashboardPage() {
   })
   if (!professional) redirect('/onboarding')
 
-  const today = new Date()
+  const today = nowInApp()
   const monthStart = startOfMonth(today)
   const lastMonthStart = startOfMonth(subMonths(today, 1))
   const historyStart = lastMonthStart // cobre mês atual + anterior
+  // Para tendência justa: mês passado só até o mesmo dia/hora de hoje
+  // (comparar mês parcial atual contra mês passado inteiro distorceria a seta).
+  const prevPeriodEnd = subMonths(today, 1)
 
   // ── Consultas ──────────────────────────────────────────────
   const [serviceRows, history, upcoming, newPatientsThis, newPatientsPrev] = await Promise.all([
@@ -87,7 +90,7 @@ export default async function DashboardPage() {
       and(
         eq(patients.professionalId, professional.id),
         gte(patients.createdAt, lastMonthStart),
-        lt(patients.createdAt, monthStart),
+        lte(patients.createdAt, prevPeriodEnd),
       ),
     ),
   ])
@@ -102,7 +105,7 @@ export default async function DashboardPage() {
   const isCancelled = (s: string) => s === 'cancelled'
 
   // ── Agendamentos de hoje ───────────────────────────────────
-  const todayAppointments = history.filter((a) => isSameDay(new Date(a.startsAt), today))
+  const todayAppointments = history.filter((a) => isSameDay(toAppTz(a.startsAt), today))
 
   const appointmentsWithRestrictions = await Promise.all(
     todayAppointments.map(async (apt) => {
@@ -115,16 +118,16 @@ export default async function DashboardPage() {
   )
 
   // ── KPIs ───────────────────────────────────────────────────
-  const monthAppts = history.filter((a) => new Date(a.startsAt) >= monthStart)
+  const monthAppts = history.filter((a) => toAppTz(a.startsAt) >= monthStart)
   const lastMonthAppts = history.filter(
-    (a) => new Date(a.startsAt) >= lastMonthStart && new Date(a.startsAt) < monthStart,
+    (a) => toAppTz(a.startsAt) >= lastMonthStart && toAppTz(a.startsAt) < monthStart,
   )
 
   const revenueThis = monthAppts
     .filter((a) => a.status === 'done')
     .reduce((sum, a) => sum + priceOf(a.serviceName), 0)
   const revenuePrev = lastMonthAppts
-    .filter((a) => a.status === 'done')
+    .filter((a) => a.status === 'done' && toAppTz(a.startsAt) <= prevPeriodEnd)
     .reduce((sum, a) => sum + priceOf(a.serviceName), 0)
 
   const doneThis = monthAppts.filter((a) => a.status === 'done').length
@@ -141,7 +144,7 @@ export default async function DashboardPage() {
   }).map((day) => ({
     label: format(day, 'd', { locale: ptBR }),
     weekday: format(day, 'EEEE', { locale: ptBR }),
-    count: history.filter((a) => isSameDay(new Date(a.startsAt), day) && !isCancelled(a.status)).length,
+    count: history.filter((a) => isSameDay(toAppTz(a.startsAt), day) && !isCancelled(a.status)).length,
     isToday: isSameDay(day, today),
   }))
 
@@ -176,11 +179,16 @@ export default async function DashboardPage() {
       icon: BellRing,
       text: `${upcoming.length} agendamento${upcoming.length > 1 ? 's' : ''} nos próximos 7 dias aguardando confirmação.`,
     })
-  const busiest = [...chartDays].sort((a, b) => b.count - a.count)[0]
-  if (busiest && busiest.count > 0)
+  // Dia da semana com mais atendimentos no agregado dos 14 dias (não um único dia)
+  const weekdayTotals = new Map<string, number>()
+  for (const d of chartDays) weekdayTotals.set(d.weekday, (weekdayTotals.get(d.weekday) ?? 0) + d.count)
+  const [busiestWeekday, busiestWeekdayCount] = [...weekdayTotals.entries()].sort(
+    (a, b) => b[1] - a[1],
+  )[0] ?? ['', 0]
+  if (busiestWeekdayCount > 0)
     insights.push({
       icon: TrendingUp,
-      text: `Seu dia mais movimentado costuma ser ${busiest.weekday}.`,
+      text: `Seu dia mais movimentado costuma ser ${busiestWeekday}.`,
     })
   if (attendanceRate != null && attendanceRate < 80 && doneThis + noShowThis >= 3)
     insights.push({
@@ -339,10 +347,10 @@ export default async function DashboardPage() {
                     <div className="flex items-start gap-3">
                       <div className="shrink-0 text-center w-9">
                         <p className="text-lg font-display font-medium text-foreground tabular-nums leading-none">
-                          {format(new Date(apt.startsAt), 'HH')}
+                          {format(toAppTz(apt.startsAt), 'HH')}
                         </p>
                         <p className="text-xs text-muted-foreground tabular-nums">
-                          {format(new Date(apt.startsAt), 'mm')}
+                          {format(toAppTz(apt.startsAt), 'mm')}
                         </p>
                       </div>
                       <div className="self-stretch w-px bg-border" />
@@ -397,7 +405,7 @@ export default async function DashboardPage() {
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm text-foreground truncate">{apt.patientName}</p>
                       <p className="text-xs text-muted-foreground truncate">
-                        {format(new Date(apt.startsAt), "EEE, d 'de' MMM · HH:mm", { locale: ptBR })}
+                        {format(toAppTz(apt.startsAt), "EEE, d 'de' MMM · HH:mm", { locale: ptBR })}
                       </p>
                     </div>
                     <span className="text-xs text-muted-foreground shrink-0 truncate max-w-[40%]">

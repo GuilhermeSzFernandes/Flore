@@ -7,6 +7,8 @@ import { eq, and, gte, lt, count } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { canCreateAppointment, type Plan } from '@/lib/plan'
 import { buildWhatsAppReminderUrl } from '@/lib/whatsapp'
+import { nowInApp, parseAppDateTime } from '@/lib/datetime'
+import { startOfMonth, endOfMonth } from 'date-fns'
 
 async function getProfessional(userId: string) {
   return db.query.professionals.findFirst({
@@ -78,9 +80,9 @@ export async function createAppointment(formData: FormData) {
   const professional = await getProfessional(session.user.id)
   if (!professional) return { success: false, error: 'Perfil não encontrado' }
 
-  const now = new Date()
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
-  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+  const now = nowInApp()
+  const monthStart = startOfMonth(now)
+  const monthEnd = endOfMonth(now)
 
   const [{ value: usedThisMonth }] = await db
     .select({ value: count() })
@@ -101,7 +103,9 @@ export async function createAppointment(formData: FormData) {
   const patientName = formData.get('patientName') as string
   const patientPhone = formData.get('patientPhone') as string
   const serviceName = formData.get('serviceName') as string
-  const startsAt = new Date(formData.get('startsAt') as string)
+  // Vem de um <input type="datetime-local"> (relógio de parede, sem fuso) →
+  // interpretar como horário do Brasil, não do servidor.
+  const startsAt = parseAppDateTime(formData.get('startsAt') as string)
   const durationMin = parseInt(formData.get('durationMin') as string) || 60
   const notes = formData.get('notes') as string | null
 

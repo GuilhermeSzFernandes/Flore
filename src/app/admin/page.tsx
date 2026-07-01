@@ -1,8 +1,9 @@
 import { db } from '@/db'
 import { professionals, patients, appointments, users } from '@/db/schema'
 import { count, eq, gte, desc } from 'drizzle-orm'
-import { format } from 'date-fns'
+import { format, startOfMonth } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { nowInApp } from '@/lib/datetime'
 import { Users, CalendarDays, UserCheck, TrendingUp } from 'lucide-react'
 
 const planLabels: Record<string, string> = {
@@ -20,8 +21,8 @@ const planColors: Record<string, string> = {
 }
 
 export default async function AdminPage() {
-  const now           = new Date()
-  const startOfMonth  = new Date(now.getFullYear(), now.getMonth(), 1)
+  const now        = nowInApp()
+  const monthStart = startOfMonth(now)
 
   const [
     totalProfessionalsRows,
@@ -33,7 +34,7 @@ export default async function AdminPage() {
   ] = await Promise.all([
     db.select({ c: count() }).from(professionals),
     db.select({ c: count() }).from(patients),
-    db.select({ c: count() }).from(appointments).where(gte(appointments.startsAt, startOfMonth)),
+    db.select({ c: count() }).from(appointments).where(gte(appointments.startsAt, monthStart)),
     db.select({ c: count() }).from(appointments),
     db.select({ plan: professionals.plan, c: count() }).from(professionals).groupBy(professionals.plan),
     db.select({

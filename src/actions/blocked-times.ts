@@ -5,6 +5,7 @@ import { db } from '@/db'
 import { blockedTimes, professionals } from '@/db/schema'
 import { eq, and, gte } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
+import { appDateString } from '@/lib/datetime'
 
 async function getProfessional(userId: string) {
   return db.query.professionals.findFirst({ where: eq(professionals.userId, userId) })
@@ -57,7 +58,7 @@ export async function removeBlockedTime(id: string) {
 }
 
 export async function getUpcomingBlockedTimes(professionalId: string) {
-  const today = new Date().toISOString().slice(0, 10)
+  const today = appDateString()
   return db.query.blockedTimes.findMany({
     where: and(
       eq(blockedTimes.professionalId, professionalId),

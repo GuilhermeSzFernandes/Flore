@@ -71,7 +71,25 @@ Paleta definida via CSS custom properties OKLch em `src/app/globals.css`:
 
 Fonte display: Playfair Display (`font-display`), disponível em itálico. Fonte body: Geist Sans. Usar `font-display italic` para títulos de modais e painéis.
 
-Datas sempre formatadas com `date-fns` locale `ptBR`. Timestamps armazenados em UTC, exibidos no fuso `America/Sao_Paulo`.
+Datas sempre formatadas com `date-fns` locale `ptBR`.
+
+### Fuso horário — PADRÃO OBRIGATÓRIO
+
+Timestamps são gravados em **UTC** no banco, mas o app opera no fuso **`America/Sao_Paulo`**. O servidor de produção (Vercel) roda em **UTC** — por isso `new Date()`, `startOfMonth`, `setHours`, `format()` etc. no server **calculam no fuso errado** e deslocam dias/horários em ~3h (um atendimento às 22h de SP cai no dia seguinte).
+
+**Nunca** use `new Date()`, `new Date(str)` ou `.toISOString().slice(0,10)` cru para lógica de calendário no server. Use sempre os helpers de `src/lib/datetime.ts`:
+
+- `nowInApp()` — "agora" no fuso SP. Base para `startOfDay`/`startOfMonth`/`endOfMonth`/etc. do date-fns (que preservam o fuso do `TZDate`).
+- `toAppTz(instant)` — converte um instante do banco (Date/ISO) para SP. Use antes de `isSameDay`/`getHours`/`format()` **no server** para exibir/comparar horário local.
+- `parseAppDateTime(str)` — interpreta string de relógio de parede sem fuso (`"YYYY-MM-DD"` ou `"YYYY-MM-DDTHH:MM"`, ex: `<input type="datetime-local">`) como horário SP. Use no lugar de `new Date(str)` para esses campos.
+- `appDateString(instant?)` — data-calendário SP como `"YYYY-MM-DD"` (para o "hoje" e comparações com colunas `date`, ex: `blockedTimes.date`).
+- `appTimeOnDay(instant, hh, mm)` — instante de `HH:MM` (parede SP) no dia SP de `instant`. Para janelas de dia e pausas (almoço).
+
+Regras:
+- **Instante** (ex: `reminderSentAt: new Date()`, `gte(startsAt, new Date())`) não precisa de tratamento — um instante independe de fuso.
+- **Fronteira de calendário, parsing de horário digitado e formatação de exibição no server** sempre passam pelos helpers.
+- **`birthDate`** é date-only (`"YYYY-MM-DD"`) sem hora — formatar com `new Date(birthDate + 'T00:00:00')` já está correto; **não** envolver em `toAppTz` (deslocaria o dia).
+- **Client components** (`'use client'`) rodam no fuso do navegador; para usuárias no Brasil já é SP. O tratamento é obrigatório no **server** (pages, server actions).
 
 ### Horários de atendimento (`workingHours`)
 

@@ -4,6 +4,7 @@ import { eq, and, gte, lt, count, or } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import { startOfMonth, endOfMonth } from 'date-fns'
 import { canCreateAppointment, type Plan } from '@/lib/plan'
+import { nowInApp } from '@/lib/datetime'
 import { auth } from '@/auth'
 import PublicBookingForm from './PublicBookingForm'
 
@@ -15,7 +16,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   })
   if (!professional) notFound()
 
-  const now        = new Date()
+  const now        = nowInApp()
   const monthStart = startOfMonth(now)
   const monthEnd   = endOfMonth(now)
 

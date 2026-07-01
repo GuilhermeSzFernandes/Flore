@@ -13,6 +13,7 @@ import { updateClient, updateSensitivities, addRestriction, deactivateRestrictio
 import Link from 'next/link'
 import { ArrowLeft, Phone, Mail, Cake, X } from 'lucide-react'
 import { format } from 'date-fns'
+import { toAppTz } from '@/lib/datetime'
 import { ptBR } from 'date-fns/locale'
 
 export default async function ClientePage({ params }: { params: Promise<{ id: string }> }) {
@@ -188,7 +189,7 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
                 <div key={apt.id} className="bg-card rounded-xl border border-border p-5 space-y-3">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-semibold text-foreground font-display">
-                      {format(apt.startsAt, "d 'de' MMMM yyyy", { locale: ptBR })}
+                      {format(toAppTz(apt.startsAt), "d 'de' MMMM yyyy", { locale: ptBR })}
                     </p>
                     <span className="text-xs text-muted-foreground border border-border rounded-full px-2 py-0.5">
                       {apt.serviceName}

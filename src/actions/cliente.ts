@@ -4,8 +4,9 @@ import { auth } from '@/auth'
 import { db } from '@/db'
 import { appointments, patients, professionals, restrictions, services, blockedTimes } from '@/db/schema'
 import { eq, and, gte, lt, count, or } from 'drizzle-orm'
-import { startOfMonth, endOfMonth } from 'date-fns'
+import { startOfMonth, endOfMonth, startOfDay, endOfDay } from 'date-fns'
 import { canCreateAppointment, canAddPatient, type Plan } from '@/lib/plan'
+import { nowInApp, toAppTz, appDateString, appTimeOnDay } from '@/lib/datetime'
 import { revalidatePath } from 'next/cache'
 
 // ── Lookup profissional pelo código ──────────────────────────────────────────
@@ -93,7 +94,7 @@ export async function loadBookingData(professionalId: string) {
   const session = await auth()
   if (!session?.user?.id || session.user.role !== 'patient') return null
 
-  const today = new Date().toISOString().slice(0, 10)
+  const today = appDateString()
   const [pro, proServices, upcoming, blocked] = await Promise.all([
     db.query.professionals.findFirst({
       where: eq(professionals.id, professionalId),
@@ -164,7 +165,7 @@ export async function createClientAppointment(formData: FormData) {
   })
   if (!professional) return { success: false, error: 'Profissional não encontrada.' }
 
-  const now = new Date()
+  const now = nowInApp()
   const [{ used }] = await db
     .select({ used: count() })
     .from(appointments)
@@ -196,8 +197,9 @@ export async function createClientAppointment(formData: FormData) {
   // Verificar conflito com agendamentos já existentes do profissional
   const durationMin = service?.durationMin ?? 60
   const endsAt      = new Date(startsAt.getTime() + durationMin * 60000)
-  const dayStart    = new Date(startsAt); dayStart.setHours(0, 0, 0, 0)
-  const dayEnd      = new Date(startsAt); dayEnd.setHours(23, 59, 59, 999)
+  // Janela do dia no fuso SP (o instante startsAt pode cair em dia UTC diferente)
+  const dayStart    = startOfDay(toAppTz(startsAt))
+  const dayEnd      = endOfDay(toAppTz(startsAt))
 
   const dayAppointments = await db.query.appointments.findMany({
     where: and(
@@ -227,8 +229,9 @@ export async function createClientAppointment(formData: FormData) {
       if (lb.start && lb.end) {
         const [lh, lm] = lb.start.split(':').map(Number)
         const [eh, em] = lb.end.split(':').map(Number)
-        const lunchStart = new Date(startsAt); lunchStart.setHours(lh, lm, 0, 0)
-        const lunchEnd   = new Date(startsAt); lunchEnd.setHours(eh, em, 0, 0)
+        // Almoço é relógio de parede SP no dia do agendamento
+        const lunchStart = appTimeOnDay(startsAt, lh, lm)
+        const lunchEnd   = appTimeOnDay(startsAt, eh, em)
         if (startsAt < lunchEnd && endsAt > lunchStart) {
           return { success: false, error: 'Este horário coincide com a pausa de almoço.' }
         }

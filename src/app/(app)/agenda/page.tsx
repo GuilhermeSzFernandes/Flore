@@ -3,8 +3,8 @@ import { db } from '@/db'
 import { appointments, professionals, patients, restrictions, services } from '@/db/schema'
 import { eq, and, gte, lt } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
-import { startOfDay, endOfDay, startOfWeek, endOfWeek, addDays, format, parseISO } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+import { startOfDay, endOfDay, startOfWeek, endOfWeek } from 'date-fns'
+import { nowInApp, parseAppDateTime } from '@/lib/datetime'
 import AgendaClient from './AgendaClient'
 
 export default async function AgendaPage({
@@ -21,7 +21,8 @@ export default async function AgendaPage({
   })
   if (!professional) redirect('/onboarding')
 
-  const selectedDate = dateParam ? parseISO(dateParam) : new Date()
+  // dateParam é "YYYY-MM-DD" (relógio de parede) → interpretar no fuso SP
+  const selectedDate = dateParam ? parseAppDateTime(dateParam) : nowInApp()
 
   const rangeStart = view === 'week'
     ? startOfWeek(selectedDate, { weekStartsOn: 0 })

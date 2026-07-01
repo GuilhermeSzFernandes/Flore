@@ -6,6 +6,7 @@ import { appointments, patients, professionals, services, users } from '@/db/sch
 import { eq, and, gte, lt, count, or } from 'drizzle-orm'
 import { startOfMonth, endOfMonth } from 'date-fns'
 import { canCreateAppointment, canAddPatient, type Plan } from '@/lib/plan'
+import { nowInApp } from '@/lib/datetime'
 
 async function getPatientForSession(
   professionalId: string,
@@ -108,7 +109,7 @@ export async function createPublicAppointment(formData: FormData) {
     return { success: false, error: 'Você não está cadastrada com esta profissional.' }
   }
 
-  const now        = new Date()
+  const now        = nowInApp()
   const monthStart = startOfMonth(now)
   const monthEnd   = endOfMonth(now)
 
