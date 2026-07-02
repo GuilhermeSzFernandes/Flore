@@ -6,6 +6,10 @@ import { users } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
 
+function withTourFlag(url: string): string {
+  return url.includes('?') ? `${url}&tour=1` : `${url}?tour=1`
+}
+
 export async function completePatientOnboarding(formData: FormData, next?: string) {
   const session = await auth()
   if (!session?.user?.id) redirect('/login')
@@ -20,5 +24,5 @@ export async function completePatientOnboarding(formData: FormData, next?: strin
     .set({ name, phone, onboardedAt: new Date() })
     .where(eq(users.id, session.user.id))
 
-  redirect(next && next.startsWith('/') ? next : '/cliente/inicio')
+  redirect(withTourFlag(next && next.startsWith('/') ? next : '/cliente/inicio'))
 }

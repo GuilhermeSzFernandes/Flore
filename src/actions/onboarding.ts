@@ -157,5 +157,5 @@ export async function completeOnboarding(formData: FormData) {
     })),
   )
 
-  redirect('/dashboard')
+  redirect('/dashboard?tour=1')
 }

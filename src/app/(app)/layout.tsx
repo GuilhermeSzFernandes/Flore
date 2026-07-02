@@ -1,9 +1,11 @@
+import { Suspense } from 'react'
 import { auth } from '@/auth'
 import { db } from '@/db'
 import { professionals } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
 import { signOut } from '@/auth'
+import FloreTour from '@/components/FloreTour'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -95,6 +97,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <BottomNav />
 
       <FeedbackFAB />
+
+      <Suspense fallback={null}>
+        <FloreTour variant="professional" />
+      </Suspense>
     </div>
   )
 }

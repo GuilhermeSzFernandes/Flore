@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Calendar, Users, Settings, Scissors } from 'lucide-react'
+import { LayoutDashboard, Calendar, Users, Settings, Scissors, LifeBuoy } from 'lucide-react'
 
 const navLinks = [
   { href: '/dashboard', label: 'Hoje', icon: LayoutDashboard },
@@ -10,6 +10,7 @@ const navLinks = [
   { href: '/clientes', label: 'Clientes', icon: Users },
   { href: '/servicos', label: 'Serviços', icon: Scissors },
   { href: '/configuracoes', label: 'Config.', icon: Settings },
+  { href: '/suporte', label: 'Ajuda', icon: LifeBuoy },
 ]
 
 export function BottomNav() {

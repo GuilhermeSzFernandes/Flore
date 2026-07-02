@@ -9,6 +9,7 @@ import {
   Users,
   Settings,
   Scissors,
+  LifeBuoy,
   ChevronLeft,
   ChevronRight,
   LogOut,
@@ -22,6 +23,7 @@ const navLinks = [
   { href: '/clientes', label: 'Clientes', icon: Users },
   { href: '/servicos', label: 'Meus Serviços', icon: Scissors },
   { href: '/configuracoes', label: 'Configurações', icon: Settings },
+  { href: '/suporte', label: 'Suporte', icon: LifeBuoy },
 ]
 
 const planLabels: Record<string, string> = {
