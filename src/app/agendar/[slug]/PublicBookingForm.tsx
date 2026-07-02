@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from 'react'
 import { format, addDays, isSunday, parseISO } from 'date-fns'
-import FloreLogo from '@/components/FloreLogo'
 import { ptBR } from 'date-fns/locale'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -140,14 +139,16 @@ export default function PublicBookingForm({
     <div className="min-h-screen" style={{ background: 'oklch(0.963 0.006 80)' }}>
       <div className="max-w-xl mx-auto px-4 py-12 space-y-8">
 
-        {/* Header */}
+        {/* Header da etapa de agendamento */}
         <div className="text-center space-y-1">
-          <FloreLogo size={18} textClassName="text-xs font-semibold uppercase tracking-widest" textColor="oklch(0.575 0.115 27)" />
-          <h1 className="text-3xl font-display font-semibold" style={{ color: 'oklch(0.155 0.015 155)' }}>
-            {professional.displayName}
-          </h1>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: 'oklch(0.575 0.115 27)' }}>
+            Agendamento
+          </p>
+          <h2 className="text-3xl font-display italic" style={{ color: 'oklch(0.155 0.015 155)' }}>
+            Reserve seu horário
+          </h2>
           <p className="text-sm" style={{ color: 'oklch(0.50 0.010 155)' }}>
-            Agende sua sessão online
+            com {professional.displayName}
           </p>
         </div>
 

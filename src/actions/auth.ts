@@ -5,6 +5,11 @@ import { users, professionals } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import bcrypt from 'bcryptjs'
 import { redirect } from 'next/navigation'
+import { signOut } from '@/auth'
+
+export async function signOutAction() {
+  await signOut({ redirectTo: '/login' })
+}
 
 export async function registerProfessional(
   formData: FormData,

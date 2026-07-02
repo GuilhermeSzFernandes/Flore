@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { LogOut } from 'lucide-react'
-import { SidebarNav } from './SidebarNav'
+import { Sidebar } from './Sidebar'
 import FloreLogo from '@/components/FloreLogo'
 import { BottomNav } from './BottomNav'
 import FeedbackFAB from '@/components/FeedbackFAB'
@@ -35,63 +35,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      {/* Sidebar — visível apenas em md+ */}
-      <aside className="hidden md:flex w-56 flex-col shrink-0 h-screen sticky top-0" style={{ background: 'var(--sidebar)' }}>
-
-        {/* Wordmark */}
-        <div className="px-6 pt-7 pb-6">
-          <FloreLogo size={28} textClassName="font-display italic text-2xl tracking-tight" textColor="var(--sidebar-primary)" />
-        </div>
-
-        {/* Nav */}
-        <SidebarNav />
-
-        {/* Divisor */}
-        <div className="px-6 py-3 opacity-20">
-          <div className="border-t" style={{ borderColor: 'var(--sidebar-border)' }} />
-        </div>
-
-        {/* User footer */}
-        <div className="px-3 pb-4">
-          <DropdownMenu>
-            <DropdownMenuTrigger className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-md transition-colors text-left"
-              style={{ color: 'var(--sidebar-foreground)' }}
-            >
-              <Avatar className="w-7 h-7 shrink-0">
-                <AvatarImage src={session.user.image ?? ''} />
-                <AvatarFallback
-                  className="text-xs font-medium"
-                  style={{ background: 'var(--sidebar-accent)', color: 'var(--sidebar-foreground)' }}
-                >
-                  {professional.displayName.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium truncate" style={{ color: 'var(--sidebar-foreground)' }}>
-                  {professional.displayName}
-                </p>
-                <p className="text-[10px] mt-0.5 opacity-50">{planLabels[professional.plan]}</p>
-              </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent side="top" className="w-48">
-              <DropdownMenuItem>
-                <form
-                  action={async () => {
-                    'use server'
-                    await signOut({ redirectTo: '/login' })
-                  }}
-                  className="w-full"
-                >
-                  <button type="submit" className="flex items-center gap-2 w-full text-sm text-destructive">
-                    <LogOut className="w-3.5 h-3.5" />
-                    Sair
-                  </button>
-                </form>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </aside>
+      {/* Sidebar colapsável — visível apenas em md+ */}
+      <Sidebar
+        displayName={professional.displayName}
+        plan={professional.plan}
+        image={session.user.image}
+      />
 
       {/* Coluna direita — ocupa toda a tela no mobile */}
       <div className="flex-1 flex flex-col min-w-0 h-screen">
@@ -137,7 +86,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </header>
 
         {/* Conteúdo — padding bottom no mobile para não ficar atrás do bottom nav */}
-        <main className="flex-1 min-h-0 overflow-auto pb-16 md:pb-0">
+        <main className="flex-1 min-h-0 overflow-auto pb-24 md:pb-0">
           {children}
         </main>
       </div>

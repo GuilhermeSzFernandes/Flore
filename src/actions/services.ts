@@ -3,7 +3,7 @@
 import { auth } from '@/auth'
 import { db } from '@/db'
 import { services, professionals } from '@/db/schema'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, ne } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import type { Professional } from '@/db/schema'
 
@@ -139,6 +139,47 @@ export async function updateProfessional(formData: FormData) {
   return { success: true }
 }
 
+function slugify(raw: string): string {
+  return raw
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')   // remove acentos
+    .replace(/[^a-z0-9\s-]/g, '')      // só letras/números/espaço/hífen
+    .trim()
+    .replace(/[\s_]+/g, '-')           // espaços → hífen
+    .replace(/-+/g, '-')               // colapsa hífens
+    .replace(/^-|-$/g, '')             // remove hífens das pontas
+}
+
+export async function updateSlug(formData: FormData) {
+  const session = await auth()
+  if (!session?.user?.id) return { success: false, error: 'Não autenticado' }
+
+  const professional = await getProfessional(session.user.id)
+  if (!professional) return { success: false, error: 'Perfil não encontrado' }
+
+  const slug = slugify((formData.get('slug') as string) ?? '')
+  if (slug.length < 3) {
+    return { success: false, error: 'O nome de usuário precisa ter ao menos 3 caracteres.' }
+  }
+
+  const taken = await db.query.professionals.findFirst({
+    where: and(eq(professionals.slug, slug), ne(professionals.id, professional.id)),
+    columns: { id: true },
+  })
+  if (taken) {
+    return { success: false, error: 'Este nome de usuário já está em uso. Tente outro.' }
+  }
+
+  await db
+    .update(professionals)
+    .set({ slug })
+    .where(eq(professionals.id, professional.id))
+
+  revalidatePath('/configuracoes')
+  return { success: true, slug }
+}
+
 export async function updateBusinessData(formData: FormData) {
   const session = await auth()
   if (!session?.user?.id) return { success: false, error: 'Não autenticado' }
@@ -188,6 +229,33 @@ export async function createServiceFromServicos(formData: FormData) {
     priceInCents:   priceInCents && !isNaN(priceInCents) ? priceInCents : null,
     active:         true,
   })
+
+  revalidatePath('/servicos')
+  return { success: true }
+}
+
+export async function updateServiceFromServicos(serviceId: string, formData: FormData) {
+  const session = await auth()
+  if (!session?.user?.id) return { success: false, error: 'Não autenticado' }
+
+  const professional = await getProfessional(session.user.id)
+  if (!professional) return { success: false, error: 'Perfil não encontrado' }
+
+  const name = (formData.get('name') as string)?.trim()
+  if (!name) return { success: false, error: 'Nome do serviço é obrigatório' }
+
+  const durationMin = parseInt(formData.get('durationMin') as string) || 60
+  const priceRaw = formData.get('price') as string
+  const priceInCents = priceRaw ? Math.round(parseFloat(priceRaw.replace(',', '.')) * 100) : null
+
+  await db
+    .update(services)
+    .set({
+      name,
+      durationMin,
+      priceInCents: priceInCents && !isNaN(priceInCents) ? priceInCents : null,
+    })
+    .where(and(eq(services.id, serviceId), eq(services.professionalId, professional.id)))
 
   revalidatePath('/servicos')
   return { success: true }

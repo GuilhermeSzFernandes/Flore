@@ -26,6 +26,56 @@ async function getPatientForSession(
   }) ?? null
 }
 
+/**
+ * Garante que a cliente logada esteja vinculada a este profissional.
+ * Se já houver cadastro, retorna-o. Caso contrário, cria o registro em
+ * `patients` usando o nome/telefone já salvos no perfil da usuária —
+ * assim, ao logar pela vitrine, a cliente já entra vinculada sem repetir
+ * o formulário. Retorna null se faltar telefone ou se o plano estiver no limite
+ * (nesses casos o fluxo cai no "primeiro acesso").
+ */
+export async function ensurePatientLink(professionalId: string) {
+  const session = await auth()
+  if (!session?.user || session.user.role !== 'patient' || !session.user.id) return null
+
+  const existing = await getPatientForSession(professionalId, session.user.id, session.user.email ?? undefined)
+  if (existing) return { id: existing.id, name: existing.name, phone: existing.phone }
+
+  const dbUser = await db.query.users.findFirst({
+    where: eq(users.id, session.user.id),
+    columns: { name: true, phone: true },
+  })
+  const name  = dbUser?.name?.trim()
+  const phone = dbUser?.phone?.trim()
+  if (!name || !phone) return null
+
+  const professional = await db.query.professionals.findFirst({
+    where: eq(professionals.id, professionalId),
+    columns: { plan: true },
+  })
+  if (!professional) return null
+
+  const [{ total }] = await db
+    .select({ total: count() })
+    .from(patients)
+    .where(eq(patients.professionalId, professionalId))
+
+  if (!canAddPatient(professional.plan as Plan, Number(total))) return null
+
+  const [created] = await db
+    .insert(patients)
+    .values({
+      professionalId,
+      userId: session.user.id,
+      name,
+      phone:  phone.replace(/\D/g, ''),
+      email:  session.user.email ?? null,
+    })
+    .returning({ id: patients.id, name: patients.name, phone: patients.phone })
+
+  return created
+}
+
 export async function registerPatient(formData: FormData) {
   const session = await auth()
   if (!session?.user || session.user.role !== 'patient') {

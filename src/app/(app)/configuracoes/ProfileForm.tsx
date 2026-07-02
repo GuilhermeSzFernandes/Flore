@@ -8,6 +8,7 @@ import { updateProfessional } from '@/actions/services'
 import { toast } from 'sonner'
 import { Pencil, X } from 'lucide-react'
 import CopyLinkButton from './CopyLinkButton'
+import AvatarUploader from './AvatarUploader'
 
 interface Props {
   displayName: string
@@ -16,9 +17,10 @@ interface Props {
   address: string
   connectCode: string
   connectLink: string
+  avatarUrl: string | null
 }
 
-export default function ProfileForm({ displayName, phone, businessName, address, connectCode, connectLink }: Props) {
+export default function ProfileForm({ displayName, phone, businessName, address, connectCode, connectLink, avatarUrl }: Props) {
   const [editing, setEditing]  = useState(false)
   const [name, setName]        = useState(displayName)
   const [biz, setBiz]          = useState(businessName)
@@ -52,6 +54,9 @@ export default function ProfileForm({ displayName, phone, businessName, address,
   if (!editing) {
     return (
       <div className="space-y-5">
+        {/* Foto de perfil */}
+        <AvatarUploader avatarUrl={avatarUrl} displayName={name} />
+
         {/* Card de visualização */}
         <div className="relative rounded-xl border border-border bg-background p-5">
           <button

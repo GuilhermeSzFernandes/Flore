@@ -56,6 +56,8 @@ export const professionals = pgTable('professionals', {
   userId:        text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
   displayName:   text('display_name').notNull(),
   phone:         text('phone'),
+  avatarUrl:     text('avatar_url'),
+  galleryUrls:   text('gallery_urls').array(),
   slug:          text('slug').notNull().unique(),
   plan:          text('plan', { enum: ['beta', 'free', 'pro', 'clinic'] }).notNull().default('free'),
   specialty:     text('specialty', { enum: ['manicure', 'hairdresser', 'massagist', 'esthetician', 'other'] }),
